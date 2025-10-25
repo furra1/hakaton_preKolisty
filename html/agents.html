@@ -4,50 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Статус агентов - СПХ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Montserrat', 'Arial', sans-serif;
+        }
+
+        :root {
+            --primary: #00ccff;
+            --primary-dark: #0066ff;
+            --secondary: #8a2be2;
+            --accent: #ff0080;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0c0c2b 0%, #1a1a3e 50%, #2d1b4e 100%);
             color: #fff;
-            overflow-x: hidden;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .background {
+        .particles-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0c0c2b 0%, #1a1a3e 50%, #2d1b4e 100%);
             z-index: -2;
         }
 
-        .grid-lines {
+        .particle {
             position: absolute;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: floatAnimation 6s infinite ease-in-out;
+        }
+
+        @keyframes floatAnimation {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg);
+                -webkit-transform: translateY(0) rotate(0deg);
+            }
+            50% { 
+                transform: translateY(-20px) rotate(180deg);
+                -webkit-transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image:
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background: 
+                linear-gradient(rgba(0, 204, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 204, 255, 0.1) 1px, transparent 1px);
             background-size: 50px 50px;
-            animation: gridMove 20s linear infinite;
+            animation: gridMoveAnimation 20s linear infinite;
+            z-index: -1;
         }
 
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
+        @keyframes gridMoveAnimation {
+            0% { 
+                transform: translate(0, 0);
+                -webkit-transform: translate(0, 0);
+            }
+            100% { 
+                transform: translate(50px, 50px);
+                -webkit-transform: translate(50px, 50px);
+            }
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
             position: relative;
@@ -58,70 +94,120 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 30px;
-            margin-bottom: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px 40px;
+            margin-bottom: 60px;
+            background: rgba(255, 255, 255, 0.08);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            border: 1px solid var(--glass-border);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .header:hover::before {
+            left: 100%;
         }
 
         .logo-section {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 25px;
         }
 
         .logo {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--primary);
+            text-shadow: 0 0 30px rgba(0, 204, 255, 0.5);
+            position: relative;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
         }
 
         .title-container {
-            padding-left: 20px;
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            padding-left: 25px;
+            border-left: 2px solid var(--glass-border);
         }
 
         .site-title {
-            font-size: 1.2rem;
-            font-weight: 300;
-            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
             text-transform: lowercase;
+            letter-spacing: 2px;
         }
 
         .nav {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            padding: 10px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 12px 25px;
+            border: 1px solid var(--glass-border);
         }
 
         .nav-link {
             color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
+            font-size: 1rem;
+            transition: all 0.4s ease;
             text-transform: lowercase;
-            padding: 8px 15px;
-            border-radius: 6px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 204, 255, 0.2), transparent);
+            transition: left 0.5s ease;
         }
 
         .nav-link:hover {
             color: #fff;
             background: rgba(255, 255, 255, 0.1);
-            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .nav-link:hover::before {
+            left: 100%;
         }
 
         .nav-link.active {
             color: #fff;
-            background: rgba(0, 255, 255, 0.2);
-            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         }
 
         .main {
@@ -129,90 +215,156 @@
         }
 
         .page-title {
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            font-weight: 300;
-            text-transform: lowercase;
-            color: rgba(255, 255, 255, 0.9);
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 60px;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .title-gradient {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            animation: titlePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { 
+                text-shadow: 0 0 20px rgba(0, 204, 255, 0.8);
+            }
+            50% { 
+                text-shadow: 0 0 30px rgba(138, 43, 226, 0.8), 0 0 40px rgba(255, 0, 128, 0.6);
+            }
         }
 
         .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 30px;
+            margin-bottom: 50px;
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            text-align: center;
+            background: rgba(255, 255, 255, 0.08);
+            -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: blur(25px);
+            border-radius: 25px;
+            padding: 35px 25px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(0, 204, 255, 0.1) 0%, 
+                rgba(138, 43, 226, 0.05) 50%, 
+                rgba(255, 0, 128, 0.1) 100%);
+            z-index: -1;
         }
 
         .stat-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #00ccff;
-            text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: var(--primary);
         }
 
         .stat-label {
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: rgba(255, 255, 255, 0.7);
-            text-transform: lowercase;
+            font-weight: 600;
         }
 
         .agents-container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+            -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: blur(25px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agents-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(255, 0, 128, 0.1) 0%, 
+                rgba(0, 204, 255, 0.05) 50%, 
+                rgba(138, 43, 226, 0.1) 100%);
+            z-index: -1;
         }
 
         .agents-header {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-            gap: 15px;
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: rgba(255, 255, 255, 0.7);
-            text-transform: lowercase;
+            gap: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .agent-item {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-            gap: 15px;
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 20px;
+            padding: 25px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
             transition: all 0.3s ease;
-            border-radius: 8px;
+            cursor: pointer;
         }
 
         .agent-item:hover {
             background: rgba(255, 255, 255, 0.08);
-            transform: translateX(5px);
+            transform: translateX(10px);
         }
 
         .agent-name {
-            text-align: left;
+            font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
         .agent-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .agent-location, .agent-load, .agent-uptime {
+            color: rgba(255, 255, 255, 0.7);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -227,32 +379,27 @@
 
         .status-online {
             background: #2ecc71;
-            box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+            box-shadow: 0 0 10px #2ecc71;
         }
 
         .status-offline {
             background: #e74c3c;
-            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+            box-shadow: 0 0 10px #e74c3c;
         }
 
         .status-warning {
             background: #f39c12;
-            box-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+            box-shadow: 0 0 10px #f39c12;
         }
 
         .status-badge {
             display: inline-block;
-            padding: 5px 12px;
-            border-radius: 12px;
+            padding: 8px 16px;
+            border-radius: 25px;
             font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .agent-location, .agent-load, .agent-uptime {
-            color: rgba(255, 255, 255, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .load-bar {
@@ -284,7 +431,7 @@
 
         .empty-agents {
             text-align: center;
-            padding: 40px 20px;
+            padding: 60px 20px;
             color: rgba(255, 255, 255, 0.5);
             font-style: italic;
         }
@@ -292,25 +439,25 @@
         .filters {
             display: flex;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             justify-content: center;
             flex-wrap: wrap;
         }
 
         .filter-btn {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 8px 16px;
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 12px 20px;
             color: rgba(255, 255, 255, 0.7);
             cursor: pointer;
             transition: all 0.3s ease;
+            font-weight: 600;
         }
 
         .filter-btn.active {
-            background: rgba(0, 255, 255, 0.2);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: #fff;
-            border-color: rgba(0, 255, 255, 0.5);
         }
 
         .filter-btn:hover {
@@ -318,55 +465,80 @@
             color: #fff;
         }
 
+        @media (max-width: 1200px) {
+            .agents-header, .agent-item {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 15px;
+            }
+        }
+
         @media (max-width: 768px) {
+            .page-title {
+                font-size: 2.5rem;
+            }
+            
             .header {
                 flex-direction: column;
                 gap: 20px;
                 text-align: center;
             }
-
+            
             .logo-section {
                 flex-direction: column;
-                gap: 10px;
+                gap: 15px;
             }
-
+            
             .title-container {
                 border-left: none;
-                border-top: 1px solid rgba(255, 255, 255, 0.2);
+                border-top: 2px solid var(--glass-border);
                 padding-left: 0;
-                padding-top: 10px;
+                padding-top: 15px;
             }
-
+            
             .nav {
                 flex-direction: column;
                 width: 100%;
             }
-
+            
             .agents-header {
                 display: none;
             }
-
+            
             .agent-item {
                 grid-template-columns: 1fr;
-                gap: 10px;
+                gap: 15px;
                 text-align: left;
-                padding: 20px;
             }
-
-            .agent-name, .agent-status, .agent-location, .agent-load, .agent-uptime {
-                justify-content: flex-start;
-            }
-
+            
             .stats-container {
                 grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .agents-container {
+                padding: 25px 20px;
+            }
+            
+            .container {
+                padding: 15px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="background">
-        <div class="grid-lines"></div>
-    </div>
+    <!-- Анимированный фон с частицами -->
+    <div class="particles-background" id="particles"></div>
+    <div class="grid-overlay"></div>
 
     <div class="container">
         <header class="header">
@@ -377,30 +549,32 @@
                 </div>
             </div>
             <nav class="nav">
-                <a href="index.html" class="nav-link">главная</a>
-                <a href="history.html" class="nav-link">история поиска</a>
-                <a href="agents.html" class="nav-link active">статус агентов</a>
+                <a href="index.html" class="nav-link"><i class="fas fa-home"></i> главная</a>
+                <a href="history.html" class="nav-link"><i class="fas fa-history"></i> история запросов</a>
+                <a href="agents.html" class="nav-link active"><i class="fas fa-server"></i> статус агентов</a>
             </nav>
         </header>
 
         <main class="main">
-            <h1 class="page-title">статус агентов</h1>
+            <h1 class="page-title">
+                <span class="title-gradient">статус агентов</span>
+            </h1>
 
             <div class="stats-container">
                 <div class="stat-card">
-                    <div class="stat-value" id="totalAgents">0</div>
+                    <div class="stat-value" id="totalAgents">8</div>
                     <div class="stat-label">всего агентов</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="onlineAgents">0</div>
+                    <div class="stat-value" id="onlineAgents">6</div>
                     <div class="stat-label">агентов онлайн</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="activeChecks">0</div>
+                    <div class="stat-value" id="activeChecks">24</div>
                     <div class="stat-label">активных проверок</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="avgLoad">0%</div>
+                    <div class="stat-value" id="avgLoad">42%</div>
                     <div class="stat-label">средняя нагрузка</div>
                 </div>
             </div>
@@ -421,36 +595,120 @@
                     <div>время работы</div>
                 </div>
                 <div id="agentsList">
-                    <!-- Список агентов будет загружаться динамически -->
+                    <!-- Список агентов будет загружен через JavaScript -->
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:8000/api';
+        // Демо-данные агентов
+        const agentsData = [
+            {
+                id: 'agent_001',
+                name: 'Москва-1',
+                status: 'online',
+                location: 'Россия, Москва',
+                load: 35,
+                uptime: '15д 4ч 32м',
+                active_checks: 8
+            },
+            {
+                id: 'agent_002',
+                name: 'Нью-Йорк-1',
+                status: 'online',
+                location: 'США, Нью-Йорк',
+                load: 68,
+                uptime: '12д 8ч 15м',
+                active_checks: 12
+            },
+            {
+                id: 'agent_003',
+                name: 'Лондон-1',
+                status: 'online',
+                location: 'Великобритания, Лондон',
+                load: 42,
+                uptime: '18д 2ч 47м',
+                active_checks: 6
+            },
+            {
+                id: 'agent_004',
+                name: 'Токио-1',
+                status: 'offline',
+                location: 'Япония, Токио',
+                load: 0,
+                uptime: '0д 0ч 0м',
+                active_checks: 0
+            },
+            {
+                id: 'agent_005',
+                name: 'Сингапур-1',
+                status: 'online',
+                location: 'Сингапур',
+                load: 55,
+                uptime: '21д 12ч 3м',
+                active_checks: 9
+            },
+            {
+                id: 'agent_006',
+                name: 'Сидней-1',
+                status: 'warning',
+                location: 'Австралия, Сидней',
+                load: 85,
+                uptime: '7д 16ч 28м',
+                active_checks: 15
+            },
+            {
+                id: 'agent_007',
+                name: 'Дубай-1',
+                status: 'online',
+                location: 'ОАЭ, Дубай',
+                load: 28,
+                uptime: '9д 22ч 11м',
+                active_checks: 5
+            },
+            {
+                id: 'agent_008',
+                name: 'Сан-Паулу-1',
+                status: 'offline',
+                location: 'Бразилия, Сан-Паулу',
+                load: 0,
+                uptime: '0д 0ч 0м',
+                active_checks: 0
+            }
+        ];
 
-        // Загрузка данных агентов с сервера
-        async function loadAgents() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/agents`);
-                if (!response.ok) {
-                    throw new Error('Ошибка загрузки данных агентов');
-                }
-                return await response.json();
-            } catch (error) {
-                console.error('Error loading agents:', error);
-                return [];
+        // Инициализация частиц фона
+        function initParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const size = Math.random() * 6 + 2;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 10;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.opacity = Math.random() * 0.5 + 0.2;
+                
+                particlesContainer.appendChild(particle);
             }
         }
 
         // Обновление статистики
         function updateStats(agents) {
             const totalAgents = agents.length;
-            const onlineAgents = agents.filter(agent => agent.status === 'online' || agent.status === 'active').length;
-            const warningAgents = agents.filter(agent => agent.status === 'warning').length;
-            
-            // Рассчитываем активные проверки и среднюю нагрузку
+            const onlineAgents = agents.filter(agent => agent.status === 'online').length;
             const activeChecks = agents.reduce((sum, agent) => sum + (agent.active_checks || 0), 0);
             const avgLoad = agents.length > 0 
                 ? Math.round(agents.reduce((sum, agent) => sum + (agent.load || 0), 0) / agents.length)
@@ -463,20 +721,13 @@
         }
 
         // Отображение агентов
-        function renderAgents(agents, filter = 'all') {
+        function renderAgents(filter = 'all') {
             const agentsList = document.getElementById('agentsList');
             
             // Фильтрация
             const filteredAgents = filter === 'all' 
-                ? agents 
-                : agents.filter(agent => {
-                    switch (filter) {
-                        case 'online': return agent.status === 'online' || agent.status === 'active';
-                        case 'offline': return agent.status === 'offline' || agent.status === 'inactive';
-                        case 'warning': return agent.status === 'warning';
-                        default: return true;
-                    }
-                });
+                ? agentsData 
+                : agentsData.filter(agent => agent.status === filter);
 
             if (filteredAgents.length === 0) {
                 agentsList.innerHTML = '<div class="empty-agents">Агенты не найдены</div>';
@@ -497,19 +748,23 @@
                     <div class="agent-item" data-id="${agent.id}">
                         <div class="agent-name">
                             <div class="status-indicator ${statusClass}"></div>
-                            ${agent.name || `Агент ${agent.id}`}
+                            <i class="fas fa-server"></i> ${agent.name}
                         </div>
                         <div class="agent-status">
                             <span class="status-badge ${statusClass}">${statusText}</span>
                         </div>
-                        <div class="agent-location">${agent.location || 'Не указано'}</div>
+                        <div class="agent-location">
+                            <i class="fas fa-map-marker-alt"></i> ${agent.location}
+                        </div>
                         <div class="agent-load">
-                            ${agent.load || 0}%
+                            ${agent.load}%
                             <div class="load-bar">
-                                <div class="load-fill ${loadClass}" style="width: ${agent.load || 0}%"></div>
+                                <div class="load-fill ${loadClass}" style="width: ${agent.load}%"></div>
                             </div>
                         </div>
-                        <div class="agent-uptime">${formatUptime(agent.uptime)}</div>
+                        <div class="agent-uptime">
+                            <i class="fas fa-clock"></i> ${agent.uptime}
+                        </div>
                     </div>
                 `;
             });
@@ -520,7 +775,7 @@
             document.querySelectorAll('.agent-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const id = item.getAttribute('data-id');
-                    const agent = agents.find(a => a.id === id);
+                    const agent = agentsData.find(a => a.id === id);
                     if (agent) {
                         viewAgentDetails(agent);
                     }
@@ -531,84 +786,45 @@
         // Получение класса статуса
         function getStatusClass(status) {
             switch (status) {
-                case 'online':
-                case 'active':
-                    return 'status-online';
-                case 'offline':
-                case 'inactive':
-                    return 'status-offline';
-                case 'warning':
-                    return 'status-warning';
-                default:
-                    return 'status-offline';
+                case 'online': return 'status-online';
+                case 'offline': return 'status-offline';
+                case 'warning': return 'status-warning';
+                default: return 'status-offline';
             }
         }
 
         // Получение текста статуса
         function getStatusText(status) {
             switch (status) {
-                case 'online':
-                case 'active':
-                    return 'Онлайн';
-                case 'offline':
-                case 'inactive':
-                    return 'Офлайн';
-                case 'warning':
-                    return 'Предупреждение';
-                default:
-                    return 'Неизвестно';
-            }
-        }
-
-        // Форматирование времени работы
-        function formatUptime(uptime) {
-            if (!uptime) return 'Неизвестно';
-            
-            if (typeof uptime === 'string') {
-                return uptime;
-            }
-            
-            // Если uptime в секундах
-            const days = Math.floor(uptime / 86400);
-            const hours = Math.floor((uptime % 86400) / 3600);
-            const minutes = Math.floor((uptime % 3600) / 60);
-            
-            if (days > 0) {
-                return `${days}д ${hours}ч ${minutes}м`;
-            } else if (hours > 0) {
-                return `${hours}ч ${minutes}м`;
-            } else {
-                return `${minutes}м`;
+                case 'online': return 'Онлайн';
+                case 'offline': return 'Офлайн';
+                case 'warning': return 'Предупреждение';
+                default: return 'Неизвестно';
             }
         }
 
         // Просмотр деталей агента
         function viewAgentDetails(agent) {
             const details = `
-Детали агента: ${agent.name || `Агент ${agent.id}`}
+Детали агента: ${agent.name}
 
 Статус: ${getStatusText(agent.status)}
-Локация: ${agent.location || 'Не указано'}
-Нагрузка: ${agent.load || 0}%
+Локация: ${agent.location}
+Нагрузка: ${agent.load}%
 Активные проверки: ${agent.active_checks || 0}
-Время работы: ${formatUptime(agent.uptime)}
-Последняя активность: ${agent.last_seen ? new Date(agent.last_seen).toLocaleString('ru-RU') : 'Неизвестно'}
-Версия: ${agent.version || 'Не указана'}
+Время работы: ${agent.uptime}
 
-В реальном приложении здесь будет открыто модальное окно с детальной информацией.
+IP: 192.168.1.${Math.floor(Math.random() * 255)}
+Версия: 2.1.4
+Последний heartbeat: ${new Date().toLocaleString('ru-RU')}
             `;
             alert(details);
         }
 
         // Обновление данных в реальном времени
-        async function updateData() {
-            try {
-                const agents = await loadAgents();
-                updateStats(agents);
-                renderAgents(agents, getCurrentFilter());
-            } catch (error) {
-                console.error('Ошибка обновления данных:', error);
-            }
+        function updateData() {
+            updateStats(agentsData);
+            renderAgents(getCurrentFilter());
         }
 
         // Получение текущего фильтра
@@ -619,21 +835,18 @@
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            // Обновляем данные сразу
+            initParticles();
             updateData();
 
             // Добавляем обработчики для фильтров
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    // Убираем активный класс у всех кнопок
                     document.querySelectorAll('.filter-btn').forEach(b => {
                         b.classList.remove('active');
                     });
                     
-                    // Добавляем активный класс к текущей кнопке
                     this.classList.add('active');
                     
-                    // Применяем фильтр
                     updateData();
                 });
             });
