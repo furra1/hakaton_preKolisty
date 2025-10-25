@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Статус агентов - СПХ</title>
     <style>
+        /* Стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -18,7 +19,6 @@
             min-height: 100vh;
         }
 
-        /* Фон с градиентом и сеткой */
         .background {
             position: fixed;
             top: 0;
@@ -43,15 +43,10 @@
         }
 
         @keyframes gridMove {
-            0% {
-                transform: translate(0, 0);
-            }
-            100% {
-                transform: translate(50px, 50px);
-            }
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
         }
 
-        /* Основной контейнер */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -60,7 +55,6 @@
             z-index: 1;
         }
 
-        /* Шапка с подложкой */
         .header {
             display: flex;
             justify-content: space-between;
@@ -99,7 +93,6 @@
             text-transform: lowercase;
         }
 
-        /* Навигация с подложкой */
         .nav {
             display: flex;
             gap: 15px;
@@ -132,7 +125,6 @@
             text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
         }
 
-        /* Основной контент */
         .main {
             text-align: center;
         }
@@ -145,7 +137,6 @@
             color: rgba(255, 255, 255, 0.9);
         }
 
-        /* Статистика агентов */
         .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -177,7 +168,6 @@
             text-transform: lowercase;
         }
 
-        /* Контейнер агентов */
         .agents-container {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -300,7 +290,6 @@
             font-style: italic;
         }
 
-        /* Фильтры */
         .filters {
             display: flex;
             gap: 15px;
@@ -330,7 +319,6 @@
             color: #fff;
         }
 
-        /* Адаптивность */
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -441,87 +429,33 @@
     </div>
 
     <script>
-        // Данные агентов (в реальном приложении будут загружаться с сервера)
-        const agentsData = [
-            {
-                id: 'agent_001',
-                name: 'Московский узел',
-                status: 'online',
-                location: 'Москва, RU',
-                load: 35,
-                uptime: '15д 4ч 32м',
-                lastCheck: '2 минуты назад',
-                version: '1.2.3'
-            },
-            {
-                id: 'agent_002',
-                name: 'СПб узел',
-                status: 'online',
-                location: 'Санкт-Петербург, RU',
-                load: 72,
-                uptime: '8д 12ч 15м',
-                lastCheck: '5 минут назад',
-                version: '1.2.3'
-            },
-            {
-                id: 'agent_003',
-                name: 'Новосибирский узел',
-                status: 'warning',
-                location: 'Новосибирск, RU',
-                load: 89,
-                uptime: '3д 7ч 48м',
-                lastCheck: '12 минут назад',
-                version: '1.2.2'
-            },
-            {
-                id: 'agent_004',
-                name: 'Екатеринбургский узел',
-                status: 'online',
-                location: 'Екатеринбург, RU',
-                load: 24,
-                uptime: '21д 6ч 11м',
-                lastCheck: '1 минуту назад',
-                version: '1.2.3'
-            },
-            {
-                id: 'agent_005',
-                name: 'Казанский узел',
-                status: 'offline',
-                location: 'Казань, RU',
-                load: 0,
-                uptime: '0',
-                lastCheck: '45 минут назад',
-                version: '1.2.1'
-            },
-            {
-                id: 'agent_006',
-                name: 'Краснодарский узел',
-                status: 'online',
-                location: 'Краснодар, RU',
-                load: 56,
-                uptime: '12д 18ч 22м',
-                lastCheck: '3 минуты назад',
-                version: '1.2.3'
-            },
-            {
-                id: 'agent_007',
-                name: 'Владивостокский узел',
-                status: 'online',
-                location: 'Владивосток, RU',
-                load: 41,
-                uptime: '6д 9ч 5м',
-                lastCheck: '7 минут назад',
-                version: '1.2.3'
+        const API_BASE_URL = 'http://localhost:8000/api';
+
+        // Загрузка данных агентов с сервера
+        async function loadAgents() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/agents`);
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки данных агентов');
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Error loading agents:', error);
+                return [];
             }
-        ];
+        }
 
         // Обновление статистики
-        function updateStats() {
-            const totalAgents = agentsData.length;
-            const onlineAgents = agentsData.filter(agent => agent.status === 'online').length;
-            const warningAgents = agentsData.filter(agent => agent.status === 'warning').length;
-            const activeChecks = agentsData.reduce((sum, agent) => sum + (agent.load || 0), 0);
-            const avgLoad = Math.round(agentsData.reduce((sum, agent) => sum + agent.load, 0) / agentsData.length);
+        function updateStats(agents) {
+            const totalAgents = agents.length;
+            const onlineAgents = agents.filter(agent => agent.status === 'online' || agent.status === 'active').length;
+            const warningAgents = agents.filter(agent => agent.status === 'warning').length;
+            
+            // Рассчитываем активные проверки и среднюю нагрузку
+            const activeChecks = agents.reduce((sum, agent) => sum + (agent.active_checks || 0), 0);
+            const avgLoad = agents.length > 0 
+                ? Math.round(agents.reduce((sum, agent) => sum + (agent.load || 0), 0) / agents.length)
+                : 0;
             
             document.getElementById('totalAgents').textContent = totalAgents;
             document.getElementById('onlineAgents').textContent = onlineAgents;
@@ -530,13 +464,20 @@
         }
 
         // Отображение агентов
-        function renderAgents(filter = 'all') {
+        function renderAgents(agents, filter = 'all') {
             const agentsList = document.getElementById('agentsList');
             
             // Фильтрация
             const filteredAgents = filter === 'all' 
-                ? agentsData 
-                : agentsData.filter(agent => agent.status === filter);
+                ? agents 
+                : agents.filter(agent => {
+                    switch (filter) {
+                        case 'online': return agent.status === 'online' || agent.status === 'active';
+                        case 'offline': return agent.status === 'offline' || agent.status === 'inactive';
+                        case 'warning': return agent.status === 'warning';
+                        default: return true;
+                    }
+                });
 
             if (filteredAgents.length === 0) {
                 agentsList.innerHTML = '<div class="empty-agents">Агенты не найдены</div>';
@@ -545,7 +486,7 @@
 
             let html = '';
             filteredAgents.forEach(agent => {
-                const statusClass = `status-${agent.status}`;
+                const statusClass = getStatusClass(agent.status);
                 const statusText = getStatusText(agent.status);
                 
                 // Определяем класс нагрузки
@@ -557,19 +498,19 @@
                     <div class="agent-item" data-id="${agent.id}">
                         <div class="agent-name">
                             <div class="status-indicator ${statusClass}"></div>
-                            ${agent.name}
+                            ${agent.name || `Агент ${agent.id}`}
                         </div>
                         <div class="agent-status">
                             <span class="status-badge ${statusClass}">${statusText}</span>
                         </div>
-                        <div class="agent-location">${agent.location}</div>
+                        <div class="agent-location">${agent.location || 'Не указано'}</div>
                         <div class="agent-load">
-                            ${agent.load}%
+                            ${agent.load || 0}%
                             <div class="load-bar">
-                                <div class="load-fill ${loadClass}" style="width: ${agent.load}%"></div>
+                                <div class="load-fill ${loadClass}" style="width: ${agent.load || 0}%"></div>
                             </div>
                         </div>
-                        <div class="agent-uptime">${agent.uptime}</div>
+                        <div class="agent-uptime">${formatUptime(agent.uptime)}</div>
                     </div>
                 `;
             });
@@ -580,55 +521,95 @@
             document.querySelectorAll('.agent-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const id = item.getAttribute('data-id');
-                    viewAgentDetails(id);
+                    const agent = agents.find(a => a.id === id);
+                    if (agent) {
+                        viewAgentDetails(agent);
+                    }
                 });
             });
+        }
+
+        // Получение класса статуса
+        function getStatusClass(status) {
+            switch (status) {
+                case 'online':
+                case 'active':
+                    return 'status-online';
+                case 'offline':
+                case 'inactive':
+                    return 'status-offline';
+                case 'warning':
+                    return 'status-warning';
+                default:
+                    return 'status-offline';
+            }
         }
 
         // Получение текста статуса
         function getStatusText(status) {
             switch (status) {
-                case 'online': return 'Онлайн';
-                case 'offline': return 'Офлайн';
-                case 'warning': return 'Предупреждение';
-                default: return 'Неизвестно';
+                case 'online':
+                case 'active':
+                    return 'Онлайн';
+                case 'offline':
+                case 'inactive':
+                    return 'Офлайн';
+                case 'warning':
+                    return 'Предупреждение';
+                default:
+                    return 'Неизвестно';
+            }
+        }
+
+        // Форматирование времени работы
+        function formatUptime(uptime) {
+            if (!uptime) return 'Неизвестно';
+            
+            if (typeof uptime === 'string') {
+                return uptime;
+            }
+            
+            // Если uptime в секундах
+            const days = Math.floor(uptime / 86400);
+            const hours = Math.floor((uptime % 86400) / 3600);
+            const minutes = Math.floor((uptime % 3600) / 60);
+            
+            if (days > 0) {
+                return `${days}д ${hours}ч ${minutes}м`;
+            } else if (hours > 0) {
+                return `${hours}ч ${minutes}м`;
+            } else {
+                return `${minutes}м`;
             }
         }
 
         // Просмотр деталей агента
-        function viewAgentDetails(agentId) {
-            const agent = agentsData.find(a => a.id === agentId);
-            if (agent) {
-                alert(`Детали агента: ${agent.name}\n\nСтатус: ${getStatusText(agent.status)}\nЛокация: ${agent.location}\nНагрузка: ${agent.load}%\nВремя работы: ${agent.uptime}\nПоследняя проверка: ${agent.lastCheck}\nВерсия: ${agent.version}\n\nВ реальном приложении здесь будет открыто модальное окно с детальной информацией.`);
-                // В реальном приложении здесь будет переход на страницу с деталями или открытие модального окна
-            }
+        function viewAgentDetails(agent) {
+            const details = `
+Детали агента: ${agent.name || `Агент ${agent.id}`}
+
+Статус: ${getStatusText(agent.status)}
+Локация: ${agent.location || 'Не указано'}
+Нагрузка: ${agent.load || 0}%
+Активные проверки: ${agent.active_checks || 0}
+Время работы: ${formatUptime(agent.uptime)}
+Последняя активность: ${agent.last_seen ? new Date(agent.last_seen).toLocaleString('ru-RU') : 'Неизвестно'}
+Версия: ${agent.version || 'Не указана'}
+
+В реальном приложении здесь будет открыто модальное окно с детальной информацией.
+            `;
+            alert(details);
         }
 
-        // Имитация обновления данных в реальном времени
-        function simulateRealTimeUpdates() {
-            // Случайным образом изменяем нагрузку агентов
-            agentsData.forEach(agent => {
-                if (agent.status !== 'offline') {
-                    // Изменяем нагрузку на ±5%
-                    const change = Math.floor(Math.random() * 11) - 5; // от -5 до +5
-                    agent.load = Math.max(0, Math.min(100, agent.load + change));
-                    
-                    // Иногда меняем статус
-                    if (Math.random() < 0.02) { // 2% шанс
-                        if (agent.status === 'online') {
-                            agent.status = 'warning';
-                        } else if (agent.status === 'warning') {
-                            agent.status = Math.random() < 0.5 ? 'online' : 'offline';
-                        }
-                    }
-                }
-            });
-            
-            updateStats();
-            renderAgents(getCurrentFilter());
-            
-            // Планируем следующее обновление
-            setTimeout(simulateRealTimeUpdates, 5000);
+        // Обновление данных в реальном времени
+        async function updateData() {
+            try {
+                const agents = await loadAgents();
+                updateStats(agents);
+                renderAgents(agents, getCurrentFilter());
+            } catch (error) {
+                console.error('Ошибка обновления данных:', error);
+            }
         }
 
         // Получение текущего фильтра
@@ -639,9 +620,8 @@
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            // Обновляем статистику и отображаем агентов
-            updateStats();
-            renderAgents();
+            // Обновляем данные сразу
+            updateData();
 
             // Добавляем обработчики для фильтров
             document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -655,13 +635,12 @@
                     this.classList.add('active');
                     
                     // Применяем фильтр
-                    const filter = this.getAttribute('data-filter');
-                    renderAgents(filter);
+                    updateData();
                 });
             });
 
-            // Запускаем имитацию обновления в реальном времени
-            simulateRealTimeUpdates();
+            // Обновляем данные каждые 10 секунд
+            setInterval(updateData, 10000);
         });
     </script>
 </body>
