@@ -474,7 +474,6 @@
     </style>
 </head>
 <body>
-    <!-- Анимированный фон с частицами -->
     <div class="particles-background" id="particles"></div>
     <div class="grid-overlay"></div>
 
@@ -513,14 +512,12 @@
                     <div>действия</div>
                 </div>
                 <div id="historyList">
-                    <!-- История будет загружена через JavaScript -->
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        // Демо-данные истории
         const historyData = [
             {
                 id: 'chk_001',
@@ -559,7 +556,6 @@
             }
         ];
 
-        // Инициализация частиц фона
         function initParticles() {
             const particlesContainer = document.getElementById('particles');
             const particleCount = 50;
@@ -586,7 +582,6 @@
             }
         }
 
-        // Загрузка истории из localStorage
         function loadHistoryFromStorage() {
             const storedHistory = localStorage.getItem('checkHistory');
             if (storedHistory) {
@@ -599,12 +594,10 @@
             return [];
         }
 
-        // Отображение истории
         function renderHistory(filter = 'all') {
             const historyList = document.getElementById('historyList');
             const storedHistory = loadHistoryFromStorage();
             
-            // Объединяем демо-данные с данными из localStorage
             const allHistory = [...historyData, ...storedHistory.map(item => ({
                 id: item.checkId,
                 target: item.target,
@@ -613,7 +606,6 @@
                 checks: item.checks || ['ping']
             }))];
 
-            // Фильтрация
             const filteredHistory = filter === 'all' 
                 ? allHistory 
                 : allHistory.filter(item => item.status === filter);
@@ -653,7 +645,6 @@
 
             historyList.innerHTML = html;
 
-            // Добавляем обработчики событий
             document.querySelectorAll('.view-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -678,7 +669,6 @@
             });
         }
 
-        // Получение текста статуса
         function getStatusText(status) {
             switch (status) {
                 case 'success': return 'Успешно';
@@ -688,7 +678,6 @@
             }
         }
 
-        // Просмотр деталей проверки
         function viewCheckDetails(checkId) {
             const item = historyData.find(h => h.id === checkId) || 
                         loadHistoryFromStorage().find(h => h.checkId === checkId);
@@ -698,26 +687,20 @@
             }
         }
 
-        // Повтор проверки
         function repeatCheck(checkId) {
             const item = historyData.find(h => h.id === checkId) || 
                         loadHistoryFromStorage().find(h => h.checkId === checkId);
             
             if (item) {
                 if (confirm(`Повторить проверку для ${item.target}?`)) {
-                    // В реальном приложении здесь будет вызов API
                     alert(`Запуск повторной проверки для ${item.target}`);
-                    // window.location.href = `index.html?target=${encodeURIComponent(item.target)}&checks=${item.checks.join(',')}`;
                 }
             }
         }
 
-        // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             initParticles();
             renderHistory();
-
-            // Добавляем обработчики для фильтров
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('.filter-btn').forEach(b => {

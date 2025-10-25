@@ -536,7 +536,6 @@
     </style>
 </head>
 <body>
-    <!-- Анимированный фон с частицами -->
     <div class="particles-background" id="particles"></div>
     <div class="grid-overlay"></div>
 
@@ -595,14 +594,12 @@
                     <div>время работы</div>
                 </div>
                 <div id="agentsList">
-                    <!-- Список агентов будет загружен через JavaScript -->
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        // Демо-данные агентов
         const agentsData = [
             {
                 id: 'agent_001',
@@ -678,7 +675,6 @@
             }
         ];
 
-        // Инициализация частиц фона
         function initParticles() {
             const particlesContainer = document.getElementById('particles');
             const particleCount = 50;
@@ -705,7 +701,6 @@
             }
         }
 
-        // Обновление статистики
         function updateStats(agents) {
             const totalAgents = agents.length;
             const onlineAgents = agents.filter(agent => agent.status === 'online').length;
@@ -720,11 +715,9 @@
             document.getElementById('avgLoad').textContent = `${avgLoad}%`;
         }
 
-        // Отображение агентов
         function renderAgents(filter = 'all') {
             const agentsList = document.getElementById('agentsList');
             
-            // Фильтрация
             const filteredAgents = filter === 'all' 
                 ? agentsData 
                 : agentsData.filter(agent => agent.status === filter);
@@ -739,7 +732,6 @@
                 const statusClass = getStatusClass(agent.status);
                 const statusText = getStatusText(agent.status);
                 
-                // Определяем класс нагрузки
                 let loadClass = 'load-low';
                 if (agent.load > 70) loadClass = 'load-high';
                 else if (agent.load > 40) loadClass = 'load-medium';
@@ -771,7 +763,6 @@
 
             agentsList.innerHTML = html;
 
-            // Добавляем обработчики событий
             document.querySelectorAll('.agent-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const id = item.getAttribute('data-id');
@@ -783,7 +774,6 @@
             });
         }
 
-        // Получение класса статуса
         function getStatusClass(status) {
             switch (status) {
                 case 'online': return 'status-online';
@@ -793,7 +783,6 @@
             }
         }
 
-        // Получение текста статуса
         function getStatusText(status) {
             switch (status) {
                 case 'online': return 'Онлайн';
@@ -803,7 +792,6 @@
             }
         }
 
-        // Просмотр деталей агента
         function viewAgentDetails(agent) {
             const details = `
 Детали агента: ${agent.name}
@@ -821,24 +809,20 @@ IP: 192.168.1.${Math.floor(Math.random() * 255)}
             alert(details);
         }
 
-        // Обновление данных в реальном времени
         function updateData() {
             updateStats(agentsData);
             renderAgents(getCurrentFilter());
         }
 
-        // Получение текущего фильтра
         function getCurrentFilter() {
             const activeFilter = document.querySelector('.filter-btn.active');
             return activeFilter ? activeFilter.getAttribute('data-filter') : 'all';
         }
 
-        // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             initParticles();
             updateData();
 
-            // Добавляем обработчики для фильтров
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('.filter-btn').forEach(b => {
@@ -851,7 +835,6 @@ IP: 192.168.1.${Math.floor(Math.random() * 255)}
                 });
             });
 
-            // Обновляем данные каждые 10 секунд
             setInterval(updateData, 10000);
         });
     </script>

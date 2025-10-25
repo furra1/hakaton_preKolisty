@@ -1,36 +1,30 @@
 import { api } from './api.js';
 
-// Хранилище для истории проверок (кеш на клиенте)
 let checkHistory = JSON.parse(localStorage.getItem('checkHistory')) || [];
 
-// Инициализация истории с загрузкой данных с сервера
 export async function initHistory(historyList, onHistoryItemClick) {
+    if (!historyList) return;
+    
     historyList.innerHTML = '<div class="loading">Загрузка истории...</div>';
     
     try {
-        // Загружаем историю с сервера
         const serverHistory = await api.getHistory();
         
-        // Объединяем с локальной историей (если есть)
         const mergedHistory = mergeHistories(serverHistory, checkHistory);
         
-        // Сохраняем объединенную историю
-        checkHistory = mergedHistory.slice(0, 50); // Ограничиваем размер
+        checkHistory = mergedHistory.slice(0, 50);
         localStorage.setItem('checkHistory', JSON.stringify(checkHistory));
         
-        // Отображаем историю
         renderHistoryList(mergedHistory, historyList, onHistoryItemClick);
         
     } catch (error) {
         console.error('Ошибка загрузки истории с сервера:', error);
         
-        // Если сервер недоступен, используем локальную историю
         historyList.innerHTML = '<div class="error-message">Не удалось загрузить историю с сервера. Используется локальная история.</div>';
         renderHistoryList(checkHistory, historyList, onHistoryItemClick);
     }
 }
 
-// Добавление в историю (сохраняем и локально, и на сервере)
 export async function addToHistory(target, checks, checkId, historyList, onHistoryItemClick) {
     const historyItem = {
         id: checkId,
@@ -41,17 +35,14 @@ export async function addToHistory(target, checks, checkId, historyList, onHisto
         timestamp: Date.now()
     };
     
-    // Добавляем в локальную историю
     checkHistory.unshift(historyItem);
     if (checkHistory.length > 50) checkHistory = checkHistory.slice(0, 50);
     localStorage.setItem('checkHistory', JSON.stringify(checkHistory));
     
-    // Обновляем отображение
     if (historyList) {
         renderHistoryList(checkHistory, historyList, onHistoryItemClick);
     }
     
-    // Пытаемся синхронизировать с сервером (в фоне)
     syncWithServer(historyItem).catch(error => {
         console.error('Ошибка синхронизации с сервером:', error);
     });
@@ -59,7 +50,6 @@ export async function addToHistory(target, checks, checkId, historyList, onHisto
     return historyItem;
 }
 
-// Обновление статуса проверки в истории
 export function updateCheckStatus(checkId, status, results = null) {
     const itemIndex = checkHistory.findIndex(item => item.id === checkId);
     if (itemIndex !== -1) {
@@ -72,19 +62,16 @@ export function updateCheckStatus(checkId, status, results = null) {
     }
 }
 
-// Получение элемента истории по ID
 export function getHistoryItem(checkId) {
     return checkHistory.find(item => item.id === checkId);
 }
 
-// Очистка истории
 export async function clearHistory(historyList, onHistoryItemClick) {
     if (confirm('Вы уверены, что хотите очистить всю историю проверок?')) {
         checkHistory = [];
         localStorage.removeItem('checkHistory');
         
         try {
-            // Пытаемся очистить историю на сервере
             await api.clearHistory();
         } catch (error) {
             console.error('Ошибка очистки истории на сервере:', error);
@@ -96,31 +83,25 @@ export async function clearHistory(historyList, onHistoryItemClick) {
     }
 }
 
-// Удаление конкретной проверки из истории
 export async function deleteHistoryItem(checkId, historyList, onHistoryItemClick) {
     checkHistory = checkHistory.filter(item => item.id !== checkId);
     localStorage.setItem('checkHistory', JSON.stringify(checkHistory));
     
     try {
-        // Пытаемся удалить с сервера
         await api.deleteCheck(checkId);
     } catch (error) {
         console.error('Ошибка удаления проверки с сервера:', error);
     }
     
-    // Обновляем отображение
     if (historyList) {
         renderHistoryList(checkHistory, historyList, onHistoryItemClick);
     }
 }
 
-// Вспомогательные функции
 
-// Объединение истории с сервера и локальной истории
 function mergeHistories(serverHistory, localHistory) {
     const merged = [...serverHistory];
     
-    // Добавляем элементы из локальной истории, которых нет на сервере
     localHistory.forEach(localItem => {
         const exists = merged.some(serverItem => serverItem.id === localItem.id);
         if (!exists) {
@@ -128,7 +109,6 @@ function mergeHistories(serverHistory, localHistory) {
         }
     });
     
-    // Сортируем по дате (новые сверху)
     return merged.sort((a, b) => {
         const dateA = new Date(a.created_at || a.timestamp);
         const dateB = new Date(b.created_at || b.timestamp);
@@ -136,10 +116,8 @@ function mergeHistories(serverHistory, localHistory) {
     });
 }
 
-// Синхронизация с сервером
 async function syncWithServer(historyItem) {
     try {
-        // Отправляем данные на сервер
         await api.syncHistory(historyItem);
     } catch (error) {
         console.error('Ошибка синхронизации с сервером:', error);
@@ -147,8 +125,9 @@ async function syncWithServer(historyItem) {
     }
 }
 
-// Рендер списка истории
 function renderHistoryList(history, historyList, onHistoryItemClick) {
+    if (!historyList) return;
+    
     historyList.innerHTML = '';
     
     if (history.length === 0) {
@@ -162,7 +141,6 @@ function renderHistoryList(history, historyList, onHistoryItemClick) {
     });
 }
 
-// Создание элемента истории
 function createHistoryElement(item, onHistoryItemClick) {
     const historyItem = document.createElement('div');
     historyItem.className = 'history-item';
@@ -187,7 +165,6 @@ function createHistoryElement(item, onHistoryItemClick) {
         </div>
     `;
     
-    // Обработчики событий
     historyItem.addEventListener('click', (e) => {
         if (!e.target.closest('.history-actions')) {
             onHistoryItemClick(item.id);
@@ -205,20 +182,17 @@ function createHistoryElement(item, onHistoryItemClick) {
     
     repeatBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        // Здесь можно вызвать функцию для повторения проверки
         console.log('Повтор проверки:', item.id);
     });
     
     deleteBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        // Здесь можно вызвать функцию для удаления
-        console.log('Удаление проверки:', item.id);
+        deleteHistoryItem(item.id);
     });
     
     return historyItem;
 }
 
-// Получение текста статуса
 function getStatusText(status) {
     switch (status) {
         case 'completed': return 'Завершено';
@@ -229,7 +203,6 @@ function getStatusText(status) {
     }
 }
 
-// Форматирование даты
 function formatDate(dateString) {
     if (!dateString) return 'Неизвестно';
     
@@ -241,7 +214,6 @@ function formatDate(dateString) {
     }
 }
 
-// Экранирование HTML
 function escapeHtml(unsafe) {
     if (!unsafe) return '';
     return unsafe
