@@ -1,3 +1,51 @@
+export function showNotification(type, title, message, duration = 5000) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    
+    const icons = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle'
+    };
+    
+    notification.innerHTML = `
+        <div class="notification-icon">
+            <i class="${icons[type] || icons.info}"></i>
+        </div>
+        <div class="notification-content">
+            <div class="notification-title">${title}</div>
+            <div class="notification-message">${message}</div>
+        </div>
+        <button class="notification-close">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+    
+    const closeNotification = () => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 400);
+    };
+    
+    notification.querySelector('.notification-close').addEventListener('click', closeNotification);
+    
+    if (duration > 0) {
+        setTimeout(closeNotification, duration);
+    }
+    
+    return closeNotification;
+}
+
 export function setupButtonAnimations() {
     const checkButton = document.querySelector('.check-button');
     if (!checkButton) return;
@@ -17,18 +65,18 @@ export function setupButtonAnimations() {
 
 export function validateForm(target, selectedChecks) {
     if (!target || selectedChecks.length === 0) {
-        alert('Пожалуйста, заполните хост и выберите хотя бы один тип проверки.');
+        showNotification('warning', 'Неполные данные', 'Пожалуйста, заполните хост и выберите хотя бы один тип проверки.');
         return false;
     }
     
     if (target.length > 255) {
-        alert('Слишком длинный хост. Максимальная длина - 255 символов.');
+        showNotification('warning', 'Слишком длинный хост', 'Максимальная длина - 255 символов.');
         return false;
     }
     
     const hostRegex = /^[a-zA-Z0-9.-]+(?::\d+)?$/;
     if (!hostRegex.test(target)) {
-        alert('Пожалуйста, введите корректный хост или IP-адрес.');
+        showNotification('warning', 'Некорректный хост', 'Пожалуйста, введите корректный хост или IP-адрес.');
         return false;
     }
     

@@ -723,6 +723,94 @@
             color: white;
         }
 
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 25px;
+            border-radius: 15px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 400px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9));
+            border-left: 4px solid #2ecc71;
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.9), rgba(192, 57, 43, 0.9));
+            border-left: 4px solid #e74c3c;
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, rgba(243, 156, 18, 0.9), rgba(230, 126, 34, 0.9));
+            border-left: 4px solid #f39c12;
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.9), rgba(41, 128, 185, 0.9));
+            border-left: 4px solid #3498db;
+        }
+
+        .notification-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .notification-message {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.3s ease;
+        }
+
+        .notification-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         @media (max-width: 1200px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -772,6 +860,12 @@
             
             .form-container, .status-panel, .results-section {
                 padding: 30px 25px;
+            }
+
+            .notification {
+                max-width: calc(100vw - 40px);
+                right: 20px;
+                left: 20px;
             }
         }
 
@@ -890,6 +984,53 @@
     </div>
 
     <script>
+        function showNotification(type, title, message, duration = 5000) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle'
+            };
+            
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="${icons[type] || icons.info}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            const closeNotification = () => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 400);
+            };
+            
+            notification.querySelector('.notification-close').addEventListener('click', closeNotification);
+            
+            if (duration > 0) {
+                setTimeout(closeNotification, duration);
+            }
+            
+            return closeNotification;
+        }
 
         const API_BASE_URL = 'http://localhost:8000/api';
 
@@ -1081,7 +1222,18 @@
             const selectedChecks = Array.from(checkboxes).map(cb => cb.value);
 
             if (!target || selectedChecks.length === 0) {
-                alert('Пожалуйста, заполните хост и выберите хотя бы один тип проверки.');
+                showNotification('warning', 'Неполные данные', 'Пожалуйста, заполните хост и выберите хотя бы один тип проверки.');
+                return;
+            }
+
+            if (target.length > 255) {
+                showNotification('warning', 'Слишком длинный хост', 'Максимальная длина - 255 символов.');
+                return;
+            }
+
+            const hostRegex = /^[a-zA-Z0-9.-]+(?::\d+)?$/;
+            if (!hostRegex.test(target)) {
+                showNotification('warning', 'Некорректный хост', 'Пожалуйста, введите корректный хост или IP-адрес.');
                 return;
             }
 
@@ -1099,6 +1251,8 @@
                 const result = await api.createCheck(checkData);
                 console.log('Ответ от бэкенда:', result);
                 
+                showNotification('success', 'Проверка запущена', `Проверка для ${target} успешно создана. ID: ${result.checkId}`, 4000);
+                
                 const historyItem = {
                     target,
                     checkId: result.checkId,
@@ -1115,7 +1269,11 @@
 
             } catch (error) {
                 console.error('Ошибка при создании проверки:', error);
-                alert(`Ошибка: ${error.message}\n\nУбедитесь, что:\n1. Бэкенд запущен на localhost:8000\n2. CORS настроен правильно`);
+                showNotification(
+                    'error', 
+                    'Ошибка подключения', 
+                    `${error.message}. Убедитесь, что бэкенд запущен на localhost:8000 и CORS настроен правильно.`
+                );
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<span class="button-text"><i class="fas fa-rocket"></i> запустить проверку</span>';
@@ -1142,6 +1300,14 @@
                     
                     if (isCheckComplete(result)) {
                         console.log('Проверка завершена');
+                        const successCount = result.results.filter(r => r.status === 'completed').length;
+                        const totalCount = result.results.length;
+                        
+                        if (successCount === totalCount) {
+                            showNotification('success', 'Проверка завершена', `Все ${totalCount} проверок успешно выполнены.`);
+                        } else {
+                            showNotification('warning', 'Проверка завершена', `${successCount} из ${totalCount} проверок выполнены успешно.`);
+                        }
                         break;
                     }
                     
@@ -1150,6 +1316,7 @@
                 } catch (error) {
                     console.error('Ошибка при получении результатов:', error);
                     resultsContainer.innerHTML = `<div class="agent-result"><h4 class="status-error">Ошибка: ${error.message}</h4></div>`;
+                    showNotification('error', 'Ошибка получения результатов', error.message);
                     break;
                 }
             }

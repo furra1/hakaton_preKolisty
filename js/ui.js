@@ -1,4 +1,5 @@
 import { api } from './api.js';
+import { showNotification } from './utils.js';
 
 export function showResultsSection(checkId, checkIdSpan, resultsSection, resultsContainer) {
     if (!checkIdSpan || !resultsSection || !resultsContainer) return;
@@ -53,6 +54,14 @@ export async function pollCheckResults(checkId, resultsContainer) {
             
             if (isCheckComplete(result)) {
                 console.log('Проверка завершена');
+                const successCount = result.results.filter(r => r.status === 'completed').length;
+                const totalCount = result.results.length;
+                
+                if (successCount === totalCount) {
+                    showNotification('success', 'Проверка завершена', `Все ${totalCount} проверок успешно выполнены.`);
+                } else {
+                    showNotification('warning', 'Проверка завершена', `${successCount} из ${totalCount} проверок выполнены успешно.`);
+                }
                 break;
             }
             
@@ -61,6 +70,7 @@ export async function pollCheckResults(checkId, resultsContainer) {
         } catch (error) {
             console.error('Ошибка при получении результатов:', error);
             resultsContainer.innerHTML = `<div class="agent-result"><h4 class="status-error">Ошибка: ${error.message}</h4></div>`;
+            showNotification('error', 'Ошибка получения результатов', error.message);
             break;
         }
     }

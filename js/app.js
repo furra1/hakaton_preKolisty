@@ -1,7 +1,7 @@
 import { api } from './api.js';
 import { initHistory, addToHistory } from './history.js';
 import { showResultsSection, pollCheckResults, renderResults } from './ui.js';
-import { setupButtonAnimations, validateForm, setButtonState } from './utils.js';
+import { setupButtonAnimations, validateForm, setButtonState, showNotification } from './utils.js';
 
 const checkForm = document.getElementById('checkForm');
 const targetInput = document.getElementById('target');
@@ -63,6 +63,7 @@ async function loadRealTimeData() {
         
     } catch (error) {
         console.error('Ошибка загрузки данных:', error);
+        showNotification('error', 'Ошибка загрузки данных', 'Не удалось загрузить информацию об агентах');
     }
 }
 
@@ -139,6 +140,8 @@ if (checkForm) {
             const checkData = { target, checks: selectedChecks };
             const result = await api.createCheck(checkData);
             
+            showNotification('success', 'Проверка запущена', `Проверка для ${target} успешно создана. ID: ${result.checkId}`, 4000);
+            
             if (historyList) {
                 addToHistory(target, selectedChecks, result.checkId, historyList, onHistoryItemClick);
             }
@@ -149,7 +152,7 @@ if (checkForm) {
 
         } catch (error) {
             console.error('Ошибка при создании проверки:', error);
-            alert(`Ошибка: ${error.message}`);
+            showNotification('error', 'Ошибка проверки', error.message);
         } finally {
             setButtonState(submitBtn, false, 'проверить');
         }
